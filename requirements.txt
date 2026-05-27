@@ -1,0 +1,17 @@
+# Reverse Shell Network Detection Lab
+# Tools & Environment Requirements
+
+# Attacker Machine
+kali-linux >= 2024.1
+netcat (pre-installed on Kali)
+metasploit-framework >= 6.4
+wireshark >= 4.0
+
+# Victim Machine
+ubuntu-server >= 22.04
+
+# Virtualization
+virtualbox >= 7.0
+
+# Network Mode
+# Both VMs: Bridged Adapter
